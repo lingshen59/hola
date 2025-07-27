@@ -68,7 +68,7 @@
 </head>
 <body>
   <!-- 鬼畜音效播放器 -->
-  <audio id="bgMusic" autoplay preload="auto" controls style="display:none;" volume="0.8">
+  <audio id="bgMusic" autoplay loop preload="auto" controls style="display:none;" volume="0.8" muted>
     <source src="https://files.catbox.moe/8x9wqo.mp3" type="audio/mpeg">
     <source src="https://files.catbox.moe/kd4499.mp3" type="audio/mpeg">
     <source src="https://files.catbox.moe/osrhy0.mp3" type="audio/mpeg">
@@ -87,6 +87,7 @@
        <p>我告诉你，<span class="rainbow">我有的是办法联系你！</span></p>
        <p>说完哈喽就把我拉黑，<span class="rainbow">这样不太好吧？</span> <span class="emoji">😤</span></p>
       <p style="margin-top: 20px; font-size: 14px; color: #888;">🎶 正在播放鬼畜音效 🎶</p>
+      <p style="font-size: 12px; color: #666; margin-top: 10px;">📱 如果听不到声音，请点击页面任意位置</p>
     </div>
 
   <script>
@@ -115,21 +116,19 @@
       bgMusic.play().then(() => {
         console.log('🎵 鬼畜音效开始播放！');
       }).catch(error => {
-        console.log('音频播放失败');
-        // 如果自动播放失败，尝试静音播放
-        bgMusic.muted = true;
-        bgMusic.play().then(() => {
-          // 延迟取消静音
-          setTimeout(() => {
-            bgMusic.muted = false;
-          }, 1000);
-        }).catch(() => {
-          // 如果还是失败，等待用户交互
-          setTimeout(() => {
-            bgMusic.play();
-          }, 100);
-        });
+        console.log('音频播放失败，等待用户交互');
       });
+    }
+    
+    // 用户交互后取消静音并播放
+    function enableAudio() {
+      if (bgMusic.muted) {
+        bgMusic.muted = false;
+        bgMusic.volume = 0.8;
+        if (bgMusic.paused) {
+          playRandomAudio();
+        }
+      }
     }
     
     // 音频结束时切换到下一个
@@ -139,43 +138,31 @@
       }, 500);
     });
     
-    // 页面加载完成后立即播放
-    window.addEventListener('load', () => {
-      playRandomAudio();
-    });
-    
-    // 立即尝试播放
-    setTimeout(() => {
-      playRandomAudio();
-    }, 100);
-    
-    // 添加更多触发播放的事件
+    // 页面加载完成后立即尝试播放
     document.addEventListener('DOMContentLoaded', () => {
-      playRandomAudio();
+      // 先静音播放，等待用户交互后取消静音
+      setTimeout(() => {
+        playRandomAudio();
+      }, 1000);
     });
     
-    // 用户交互后播放
-    document.addEventListener('click', () => {
-      if (bgMusic.paused) {
-        playRandomAudio();
-      }
-    }, { once: true });
+    // 用户交互事件监听器
+    const userInteractionEvents = ['click', 'touchstart', 'keydown', 'scroll'];
     
-    document.addEventListener('touchstart', () => {
-      if (bgMusic.paused) {
-        playRandomAudio();
-      }
-    }, { once: true });
+    userInteractionEvents.forEach(eventType => {
+      document.addEventListener(eventType, enableAudio, { once: true });
+    });
     
-    document.addEventListener('keydown', () => {
-      if (bgMusic.paused) {
-        playRandomAudio();
-      }
-    }, { once: true });
-    
-    // 页面可见时播放
+    // 页面可见性变化时尝试播放
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && bgMusic.paused) {
+        playRandomAudio();
+      }
+    });
+    
+    // 窗口获得焦点时尝试播放
+    window.addEventListener('focus', () => {
+      if (bgMusic.paused) {
         playRandomAudio();
       }
     });
