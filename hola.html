@@ -109,7 +109,7 @@
 <body>
   <!-- 鬼畜音效播放器 -->
   <audio id="bgMusic" preload="auto" loop style="display:none;">
-    <source src="https://youtu.be/6VxcZv3KZQg?si=LV_sGwK7z-mmS6Eu" type="audio/mpeg">
+    <source src="" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
   
@@ -129,8 +129,8 @@
   <script>
     const startTime = Date.now();
     
-    // 音频链接 - 请替换为您的YouTube音频链接
-    const audioUrl = 'https://youtu.be/6VxcZv3KZQg?si=LV_sGwK7z-mmS6Eu';  // 请替换为YouTube链接
+    // 音频链接 - MP3文件（与HTML文件在同一目录）
+    const audioUrl = './audio.mp3';  // 请将您的MP3文件命名为audio.mp3并放在同一目录
     
     const bgMusic = document.getElementById('bgMusic');
     
